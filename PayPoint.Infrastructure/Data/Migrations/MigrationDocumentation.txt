@@ -1,0 +1,6 @@
+How to create a migration: ==> initialMigration is the name of the migration
+dotnet ef migrations add initialMigration --project PayPoint.Infrastructure -o Data/Migrations --startup-project PayPoint.Api
+
+
+How to update the database
+dotnet ef database update --project PayPoint.Infrastructure --startup-project PayPoint.Api
