@@ -18,6 +18,7 @@ public class MappingProfile : Profile
         CreateMap<CategoryCreateDto, CategoryEntity>();
         CreateMap<CategoryUpdateDto, CategoryEntity>();
         CreateMap<CategoryEntity, Category>();
+        CreateMap<SubCategoryEntity, CategorySubCategory>();
 
         CreateMap<SubCategoryCreateDto, SubCategoryEntity>();
         CreateMap<SubCategoryUpdateDto, SubCategoryEntity>();

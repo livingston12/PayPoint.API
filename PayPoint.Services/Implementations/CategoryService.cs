@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using PayPoint.Core.DTOs.Categories;
 using PayPoint.Core.Entities;
+using PayPoint.Core.Extensions;
 using PayPoint.Core.Interfaces;
 using PayPoint.Core.Models;
 using PayPoint.Services.Interfaces;
@@ -31,7 +32,7 @@ public class CategoryService : BaseService, ICategoryService
             query = query.Include(c => c.SubCategories);
         }
 
-        CategoryEntity? categoryEntity = await query.FirstOrDefaultAsync(c => c.Id == CategoryId);
+        CategoryEntity? categoryEntity = await query.FirstOrDefaultAsync(c => c.CategoryId == CategoryId);
 
         if (categoryEntity is null)
         {
@@ -55,30 +56,37 @@ public class CategoryService : BaseService, ICategoryService
         return _mapper.Map<IEnumerable<Category>>(categories);
     }
 
-    public async Task AddCategoryAsync(CategoryCreateDto CategoryCreateDto)
+    public async Task<Category?> AddCategoryAsync(CategoryCreateDto CategoryCreateDto)
     {
         CategoryEntity categoryEntity = _mapper.Map<CategoryEntity>(CategoryCreateDto);
         categoryEntity.Status = Core.Enums.CategoryStatus.Active;
         
         await _unitOfWork.Categories.AddAsync(categoryEntity);
-        await _unitOfWork.SaveChangesAsync();
+        int? rowInserted = await _unitOfWork.SaveChangesAsync();
+
+        if (rowInserted.IsLessThanOrEqualTo(0))
+        {
+            return null;
+        }
+
+        return _mapper.Map<Category>(categoryEntity);
     }
 
-    public async Task UpdateCategoryAsync(int id, CategoryUpdateDto CategoryUpdateDto)
+    public async Task<int> UpdateCategoryAsync(int id, CategoryUpdateDto CategoryUpdateDto)
     {
         CategoryEntity categoryEntity = await GetCategoryById(id);
 
         _mapper.Map(CategoryUpdateDto, categoryEntity);
 
         _unitOfWork.Categories.Update(categoryEntity);
-        await _unitOfWork.SaveChangesAsync();
+        return await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task DeleteCategoryAsync(int id)
+    public async Task<int> DeleteCategoryAsync(int id)
     {
         _ = await GetCategoryById(id);
 
         await _unitOfWork.Categories.DeleteAsync(id);
-        await _unitOfWork.SaveChangesAsync();
+        return await _unitOfWork.SaveChangesAsync();
     }
 }

@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using PayPoint.Api.Extensions;
 using PayPoint.Core.DTOs.Categories;
 using PayPoint.Core.DTOs.SubCategories;
+using PayPoint.Core.Extensions;
 using PayPoint.Core.Models;
 using PayPoint.Services.Interfaces;
 
@@ -18,33 +20,71 @@ public class CategoryController : BaseController
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Category>> GetCategories([FromHeader] CategoryDto categoryDto)
+    public async Task<IActionResult> GetCategories([FromHeader(Name = "IncludeSubCategories")] bool? includeSubCategories)
     {
-        return await _categoryService.GetCategoriesAsync(categoryDto);
+        CategoryDto categoryDto = new CategoryDto(IncludeSubCategories: includeSubCategories == true);
+        IEnumerable<Category> categories = await _categoryService.GetCategoriesAsync(categoryDto);
+
+        categories = categories.Select(x => x.ToCategoryHasIncludes(categoryDto.IncludeSubCategories));
+
+        return Ok(categories);
     }
 
     [HttpGet("{id}")]
-    public async Task<Category?> GetCategoryById(int id, [FromHeader] CategoryDto categoryDto)
+    public async Task<IActionResult> GetCategoryById(int id, [FromHeader(Name = "IncludeSubCategories")] bool? includeSubCategories)
     {
-        return await _categoryService.GetCategoryByIdAsync(id, categoryDto);
+        CategoryDto categoryDto = new CategoryDto(IncludeSubCategories: includeSubCategories == true);
+        Category? category = await _categoryService.GetCategoryByIdAsync(id, categoryDto);
+
+        if (category.IsNullOrEmpty())
+        {
+            return NotFound("Category not found.");
+        }
+
+        category = category!.ToCategoryHasIncludes(categoryDto.IncludeSubCategories);
+
+        return Ok(category);
     }
 
     [HttpPost]
-    public async Task AddCategory([FromBody] CategoryCreateDto categoryCreateDto)
+    public async Task<IActionResult> AddCategory([FromBody] CategoryCreateDto categoryCreateDto)
     {
-        await _categoryService.AddCategoryAsync(categoryCreateDto);
+        Category? category = await _categoryService.AddCategoryAsync(categoryCreateDto);
+
+        if (category.IsNullOrEmpty())
+        {
+            BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
+        }
+        
+        category = category!.ToCategoryHasIncludes(IncludeSubCategories: false);
+        
+        return Ok(category);
     }
 
     [HttpPut("{id}")]
-    public async Task UpdateCategory(int id, [FromBody] CategoryUpdateDto categoryUpdateDto)
+    public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryUpdateDto categoryUpdateDto)
     {
-        await _categoryService.UpdateCategoryAsync(id, categoryUpdateDto);
+        int rowsUpdated = await _categoryService.UpdateCategoryAsync(id, categoryUpdateDto);
+
+        if (rowsUpdated == 0)
+        {
+            BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
+        }
+
+        return Ok();
     }
 
     [HttpDelete("{id}")]
-    public async Task DeleteCategory(int id)
+    public async Task<IActionResult> DeleteCategory(int id)
     {
-        await _categoryService.DeleteCategoryAsync(id);
+        int rowsDeleted = await _categoryService.DeleteCategoryAsync(id);
+
+        if (rowsDeleted == 0)
+        {
+            BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
+        }
+
+        return Ok();
     }
 
     [HttpGet("subcategories")]
