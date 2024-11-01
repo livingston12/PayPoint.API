@@ -1,8 +1,9 @@
+using PayPoint.Core.Extensions;
 using PayPoint.Core.Models;
 
 namespace PayPoint.Api.Extensions;
 
-public static class CategoryExtension
+public static class ModelExtension
 {
     public static Category ToCategoryHasIncludes(this Category category, bool IncludeSubCategories)
     {

@@ -7,7 +7,7 @@ public interface ISubCategoryService
 {
     Task<SubCategory?> GetSubCategoryByIdAsync(int SubCategoryId);
     Task<IEnumerable<SubCategory>> GetSubCategoriesAsync();
-    Task AddSubCategoryAsync(SubCategoryCreateDto SubCategoryCreateDto);
-    Task UpdateSubCategoryAsync(int id, SubCategoryUpdateDto SubCategoryUpdateDto);
-    Task DeleteSubCategoryAsync(int id);
+    Task<SubCategory?> AddSubCategoryAsync(SubCategoryCreateDto SubCategoryCreateDto);
+    Task<bool> UpdateSubCategoryAsync(int id, SubCategoryUpdateDto SubCategoryUpdateDto);
+    Task<bool> DeleteSubCategoryAsync(int id);
 }

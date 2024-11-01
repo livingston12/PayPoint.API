@@ -28,7 +28,6 @@ public class BaseValidator<TDto> : AbstractValidator<TDto>
     protected void RulesCategoryId(Expression<Func<TDto, int?>> propertyExpression)
     {
         RuleFor(propertyExpression)
-            .NotEmpty().WithMessage("La categoria es obligatoria.")
             .GreaterThan(0).WithMessage("La categoria debe ser mayor a 0.");
     }
 

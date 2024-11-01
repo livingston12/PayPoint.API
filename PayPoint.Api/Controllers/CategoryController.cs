@@ -11,12 +11,10 @@ namespace PayPoint.Api.Controllers;
 public class CategoryController : BaseController
 {
     private readonly ICategoryService _categoryService;
-    private readonly ISubCategoryService _subCategoryService;
 
-    public CategoryController(ICategoryService categoryService, ISubCategoryService subCategoryService)
+    public CategoryController(ICategoryService categoryService)
     {
         _categoryService = categoryService;
-        _subCategoryService = subCategoryService;
     }
 
     [HttpGet]
@@ -87,33 +85,5 @@ public class CategoryController : BaseController
         return Ok();
     }
 
-    [HttpGet("subcategories")]
-    public async Task<IEnumerable<SubCategory>> GetSubCategories()
-    {
-        return await _subCategoryService.GetSubCategoriesAsync();
-    }
-
-    [HttpGet("subcategories/{subCategoryId}")]
-    public async Task<SubCategory?> GetSubCategoryById(int subCategoryId)
-    {
-        return await _subCategoryService.GetSubCategoryByIdAsync(subCategoryId);
-    }
-
-    [HttpPost("subcategories")]
-    public async Task AddSubCategory([FromBody] SubCategoryCreateDto subCategoryCreateDto)
-    {
-        await _subCategoryService.AddSubCategoryAsync(subCategoryCreateDto);
-    }
-
-    [HttpPut("subcategories/{id}")]
-    public async Task UpdateSubCategory(int id, [FromBody] SubCategoryUpdateDto subCategoryUpdateDto)
-    {
-        await _subCategoryService.UpdateSubCategoryAsync(id, subCategoryUpdateDto);
-    }
-
-    [HttpDelete("subcategories/{id}")]
-    public async Task DeleteSubCategory(int id)
-    {
-        await _subCategoryService.DeleteSubCategoryAsync(id);
-    }
+    
 }
