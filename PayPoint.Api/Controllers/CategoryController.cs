@@ -56,15 +56,15 @@ public class CategoryController : BaseController
         
         category = category!.ToCategoryHasIncludes(IncludeSubCategories: false);
         
-        return Ok(category);
+        return CreatedAtAction(nameof(GetCategoryById), new { id = category!.CategoryId }, category);
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryUpdateDto categoryUpdateDto)
     {
-        int rowsUpdated = await _categoryService.UpdateCategoryAsync(id, categoryUpdateDto);
+        bool isUpdated = await _categoryService.UpdateCategoryAsync(id, categoryUpdateDto);
 
-        if (rowsUpdated == 0)
+        if (!isUpdated)
         {
             BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
         }
@@ -75,15 +75,13 @@ public class CategoryController : BaseController
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCategory(int id)
     {
-        int rowsDeleted = await _categoryService.DeleteCategoryAsync(id);
+        bool isDeleted = await _categoryService.DeleteCategoryAsync(id);
 
-        if (rowsDeleted == 0)
+        if (!isDeleted)
         {
             BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
         }
 
         return Ok();
     }
-
-    
 }

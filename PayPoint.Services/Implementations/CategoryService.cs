@@ -72,21 +72,25 @@ public class CategoryService : BaseService, ICategoryService
         return _mapper.Map<Category>(categoryEntity);
     }
 
-    public async Task<int> UpdateCategoryAsync(int id, CategoryUpdateDto CategoryUpdateDto)
+    public async Task<bool> UpdateCategoryAsync(int id, CategoryUpdateDto CategoryUpdateDto)
     {
         CategoryEntity categoryEntity = await GetCategoryById(id);
 
         _mapper.Map(CategoryUpdateDto, categoryEntity);
 
         _unitOfWork.Categories.Update(categoryEntity);
-        return await _unitOfWork.SaveChangesAsync();
+        int? rowsUpdated = await _unitOfWork.SaveChangesAsync();
+
+        return rowsUpdated.IsGreaterThan(0);
     }
 
-    public async Task<int> DeleteCategoryAsync(int id)
+    public async Task<bool> DeleteCategoryAsync(int id)
     {
         _ = await GetCategoryById(id);
 
         await _unitOfWork.Categories.DeleteAsync(id);
-        return await _unitOfWork.SaveChangesAsync();
+        int? rowsDeleted = await _unitOfWork.SaveChangesAsync();
+
+        return rowsDeleted.IsGreaterThan(0);
     }
 }
