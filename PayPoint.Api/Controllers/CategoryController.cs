@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using PayPoint.Api.Extensions;
 using PayPoint.Core.DTOs.Categories;
-using PayPoint.Core.DTOs.SubCategories;
 using PayPoint.Core.Extensions;
 using PayPoint.Core.Models;
 using PayPoint.Services.Interfaces;
@@ -36,7 +35,7 @@ public class CategoryController : BaseController
 
         if (category.IsNullOrEmpty())
         {
-            return NotFound("Category not found.");
+            return NotFound("Categoria no encontrada.");
         }
 
         category = category!.ToCategoryHasIncludes(categoryDto.IncludeSubCategories);
@@ -51,7 +50,7 @@ public class CategoryController : BaseController
 
         if (category.IsNullOrEmpty())
         {
-            BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
+            BadRequest(ErrorMessageBadRequest);
         }
         
         category = category!.ToCategoryHasIncludes(IncludeSubCategories: false);
@@ -66,7 +65,7 @@ public class CategoryController : BaseController
 
         if (!isUpdated)
         {
-            BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
+            BadRequest(ErrorMessageBadRequest);
         }
 
         return Ok();
@@ -79,7 +78,7 @@ public class CategoryController : BaseController
 
         if (!isDeleted)
         {
-            BadRequest("Error Inesperado: intente de nuevo o contacte con el administrador.");
+            BadRequest(ErrorMessageBadRequest);
         }
 
         return Ok();
