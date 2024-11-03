@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using PayPoint.Core.DTOs.Products;
 using PayPoint.Core.Entities;
 using PayPoint.Core.Enums;
@@ -26,33 +27,47 @@ public class ProductService : BaseService, IProductService
     {
         if (productDto is null || productId <= 0) return null;
 
-        ProductEntity? productEntity = null;
+        IQueryable<ProductEntity> query = _unitOfWork.Products.AsQueryable();
 
-        List<Expression<Func<ProductEntity, object>>> includes = new List<Expression<Func<ProductEntity, object>>>();
-
-        if (productDto.IncludeSubCategory == true)
+        if (productDto.IncludeSubCategory != false)
         {
-            includes.Add(x => x.SubCategory);
+            query = query.Include(x => x.SubCategory);
         }
 
         if (productDto.IncludeIngredients == true)
         {
-            includes.Add(x => x.ProductIngredients ?? new List<ProductIngredientEntity>());
+            query = query.Include(x => x.ProductIngredients);
         }
 
-        productEntity = await _unitOfWork.Products.GetByIdWithIncludeAsync(productId, includes.ToArray());
+        ProductEntity? productEntity = await query.FirstOrDefaultAsync(x => x.ProductId == productId);
 
-        if (productEntity is null)
+        if (productEntity.IsNullOrEmpty())
         {
             return null;
         }
 
-        return _mapper.Map<Product>(productEntity);
+        Product product = _mapper.Map<Product>(productEntity);
+
+        if (productDto.IncludeSubCategory == false)
+        {
+            product!.SubCategory = null;
+        }
+
+        return product;
     }
 
-    public async Task<IEnumerable<Product>> GetProductsAsync()
+    public async Task<IEnumerable<Product>> GetProductsAsync(int? categoryId, ProductDto productDto)
     {
-        IEnumerable<ProductEntity?> productsEntity = await _unitOfWork.Products.GetAllAsync();
+        IQueryable<ProductEntity> query = _unitOfWork.Products.AsQueryable();
+
+        query = ApplyIncludes(query, productDto, categoryId);
+
+        if (categoryId.HasValue && categoryId > 0)
+        {
+            query = query.Where(x => x.SubCategory!.CategoryId == categoryId.Value);
+        }
+
+        IEnumerable<ProductEntity?> productsEntity = await query.ToListAsync();
 
         if (productsEntity.IsNullOrEmpty())
         {
@@ -60,11 +75,38 @@ public class ProductService : BaseService, IProductService
         }
 
         return _mapper.Map<IEnumerable<Product>>(productsEntity);
+    }
+
+    private IQueryable<ProductEntity> ApplyIncludes(IQueryable<ProductEntity> query, ProductDto productDto, int? categoryId)
+    {
+        bool isCategoryIdFiltered = categoryId.HasValue && categoryId > 0;
+        productDto.IncludeCategories = isCategoryIdFiltered || productDto.IncludeCategories == true;
+       
+        if (productDto.IncludeCategories == true)
+        {
+            query = query.Include(x => x.SubCategory.Category);
+
+            if (isCategoryIdFiltered)
+            {
+                query = query.Where(x => x.SubCategory.CategoryId == categoryId!.Value);
+            }
+        }
+        else if (productDto.IncludeSubCategory == true )
+        {
+            query = query.Include(x => x.SubCategory);
+        }
+
+        if (productDto.IncludeIngredients == true)
+        {
+            query = query.Include(x => x.ProductIngredients);
+        }
+
+        return query;
     }
 
     public async Task<IEnumerable<Product>> GetProductsByCategoryIdAsync(int categoryId)
     {
-        IEnumerable<ProductEntity?> productsEntity = await _unitOfWork.Products.GetProductsBySubCategoryIdAsync(categoryId);
+        IEnumerable<ProductEntity?> productsEntity = await _unitOfWork.Products.GetProductsByCategoryIdAsync(categoryId);
 
         if (productsEntity.IsNullOrEmpty())
         {
@@ -74,14 +116,15 @@ public class ProductService : BaseService, IProductService
         return _mapper.Map<IEnumerable<Product>>(productsEntity);
     }
 
-    public async Task AddProductAsync(ProductCreateDto productCreateDto)
+    public async Task<Product?> AddProductAsync(ProductCreateDto productCreateDto)
     {
-        _ = await GetSubCategoryById(productCreateDto.SubCategoryId!.Value);
+        SubCategoryEntity subCategory = await GetSubCategoryById(productCreateDto.SubCategoryId!.Value);
 
         ProductEntity productEntity = _mapper.Map<ProductEntity>(productCreateDto);
         productEntity.Status = ProductStatus.Available;
+        productEntity.SubCategory = subCategory;
 
-        if (productCreateDto.IngredientIds.IsNotNullOrEmpty() && !productEntity.HasIngredients)
+        if (productCreateDto.IngredientIds.IsNotNullOrEmpty())
         {
             productEntity.HasIngredients = true;
 
@@ -94,18 +137,27 @@ public class ProductService : BaseService, IProductService
         }
 
         await _unitOfWork.Products.AddAsync(productEntity);
-        await _unitOfWork.SaveChangesAsync();
+        int? rowInserted = await _unitOfWork.SaveChangesAsync();
+
+        if (rowInserted.IsLessThanOrEqualTo(0))
+        {
+            return null;
+        }
+
+        return _mapper.Map<Product>(productEntity);
     }
 
-    public async Task DeleteProductAsync(int id)
+    public async Task<bool> DeleteProductAsync(int id)
     {
         _ = await GetProductById(id);
 
         await _unitOfWork.Products.DeleteAsync(id);
-        await _unitOfWork.SaveChangesAsync();
+        int? rowsDeleted = await _unitOfWork.SaveChangesAsync();
+
+        return rowsDeleted.IsGreaterThan(0);
     }
 
-    public async Task UpdateProductAsync(int id, ProductUpdateDto productUpdateDto)
+    public async Task<bool> UpdateProductAsync(int id, ProductUpdateDto productUpdateDto)
     {
         ProductEntity productEntity = await GetProductById(id);
 
@@ -129,6 +181,8 @@ public class ProductService : BaseService, IProductService
         }
 
         _unitOfWork.Products.Update(productEntity!);
-        await _unitOfWork.SaveChangesAsync();
+        int? rowsUpdated = await _unitOfWork.SaveChangesAsync();
+
+        return rowsUpdated.IsGreaterThan(0);
     }
 }

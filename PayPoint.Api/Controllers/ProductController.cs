@@ -1,6 +1,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using PayPoint.Core.DTOs.Products;
+using PayPoint.Core.Extensions;
 using PayPoint.Core.Models;
 using PayPoint.Services.Interfaces;
 
@@ -16,50 +17,78 @@ public class ProductController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProducts()
+    public async Task<IActionResult> GetProducts([FromHeader(Name = "CategoryId")] int? CategoryId, [FromHeader(Name = "IncludeIngredients")][FromQuery] ProductDto productDto)
     {
-        IEnumerable<Product> products = await _productService.GetProductsAsync();
-        
+        IEnumerable<Product> products = await _productService.GetProductsAsync(CategoryId, productDto);
+
         return Ok(products);
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetProductById(int id, [FromQuery] ProductDto productDto)
+    public async Task<IActionResult> GetProductById(int id,
+        [FromQuery(Name = "IncludeIngredients")] bool? includeIngredients,
+        [FromHeader(Name = "ExcludeSubCategory")] bool? ExcludeSubCategory)
     {
+        ProductDto productDto = new()
+        {
+            IncludeIngredients = includeIngredients == true,
+            IncludeSubCategory = ExcludeSubCategory == false
+        };
+
         Product? product = await _productService.GetProductByIdAsync(id, productDto);
-        
+
+        if (product.IsNullOrEmpty())
+        {
+            return NotFound("Producto no encontrado.");
+        }
+
         return Ok(product);
     }
 
-    [HttpGet("category/{id}")]
-    public async Task<IActionResult> GetProductsByCategoryId(int id)
+    [HttpGet("category/{categoryId}")]
+    public async Task<IActionResult> GetProductsByCategoryId(int categoryId)
     {
-        IEnumerable<Product> products = await _productService.GetProductsByCategoryIdAsync(id);
-        
+        IEnumerable<Product> products = await _productService.GetProductsByCategoryIdAsync(categoryId);
+
         return Ok(products);
     }
 
     [HttpPost]
     public async Task<IActionResult> AddProduct([FromBody] ProductCreateDto productCreateDto)
     {
-        await _productService.AddProductAsync(productCreateDto);
-        
+        Product? product = await _productService.AddProductAsync(productCreateDto);
+
+        if (product.IsNullOrEmpty())
+        {
+            return BadRequest(ErrorMessageBadRequest);
+        }
+
         return Ok();
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)
     {
-        await _productService.DeleteProductAsync(id);
-        
+        bool isDeleted = await _productService.DeleteProductAsync(id);
+
+        if (!isDeleted)
+        {
+            return BadRequest(ErrorMessageBadRequest);
+        }
+
         return Ok();
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateProduct(int id, [FromBody] ProductUpdateDto productUpdateDto)
     {
-        await _productService.UpdateProductAsync(id, productUpdateDto);
-        
+        bool isUpdated = await _productService.UpdateProductAsync(id, productUpdateDto);
+
+        if (!isUpdated)
+        {
+            return BadRequest(ErrorMessageBadRequest);
+        }
+
         return Ok();
     }
 }

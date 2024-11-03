@@ -1,4 +1,3 @@
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using PayPoint.Core.Entities;
 using PayPoint.Core.Interfaces;
@@ -14,22 +13,17 @@ public class ProductRepository : Repository<ProductEntity>, IProductRepository
     {
         _context = context;
     }
-    
-    public async Task<ProductEntity?> GetByIdWithIncludeAsync(int id, params Expression<Func<ProductEntity, object>>[] includes)
-    {
-        return await GetByIdWithIncludeAsync<ProductEntity>(id, includes);
-    }
 
     /// <summary>
     /// Gets all products by given sub category id.
     /// </summary>
-    /// <param name="subCategoryId">Sub category id.</param>
+    /// <param name="categoryId">category id.</param>
     /// <returns>Products by sub category id.</returns>
-    public async Task<IEnumerable<ProductEntity>> GetProductsBySubCategoryIdAsync(int subCategoryId)
+    public async Task<IEnumerable<ProductEntity>> GetProductsByCategoryIdAsync(int categoryId)
     {
         return await _context.Products
-            .Where(x => x.SubCategoryId == subCategoryId)
-            .Include(x => x.SubCategory)
+            .Include(x => x.SubCategory!.Category)
+            .Where(x => x.SubCategory!.CategoryId == categoryId)
             .ToListAsync();
     }
 }

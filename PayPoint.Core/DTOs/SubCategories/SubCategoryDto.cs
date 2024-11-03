@@ -1,6 +1,6 @@
-namespace PayPoint.Core.Models;
+namespace PayPoint.Core.DTOs;
 
-public class CategorySubCategory
+public class SubCategoryDto
 {
     public int SubCategoryId { get; set; }
     public string Name { get; set; }

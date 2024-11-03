@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using PayPoint.Core.DTOs;
 using PayPoint.Core.Enums;
 
 namespace PayPoint.Core.Models;
@@ -11,5 +12,5 @@ public class Category
     public CategoryStatus Status { get; set; }
 
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-    public List<CategorySubCategory>? SubCategories { get; set; }
+    public List<SubCategoryDto>? SubCategories { get; set; }
 }

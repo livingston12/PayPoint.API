@@ -24,7 +24,7 @@ public class BaseService
         {
             productEntity.ProductIngredients!.Add(new ProductIngredientEntity
             {
-                ProductId = productEntity.Id,
+                ProductId = productEntity.ProductId,
                 IngredientId = ingredientId
             });
         }

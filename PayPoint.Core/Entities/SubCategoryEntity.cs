@@ -11,5 +11,5 @@ public class SubCategoryEntity
     public int? CategoryId { get; set; }
 
     public CategoryEntity? Category { get; set; }
-    public ICollection<ProductEntity> Products { get; set; } = new List<ProductEntity>();
+    public ICollection<ProductEntity>? Products { get; set; }
 }

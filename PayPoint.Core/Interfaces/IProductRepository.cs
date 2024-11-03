@@ -2,8 +2,7 @@ using PayPoint.Core.Entities;
 
 namespace PayPoint.Core.Interfaces;
 
-public interface IProductRepository : IRepository<ProductEntity>, IRepositoryInclude<ProductEntity>
+public interface IProductRepository : IRepository<ProductEntity>
 {
-    //Task <ProductEntity?> GetByIdWithIncludeAsync(int id, params Expression<Func<ProductEntity, object>>[] includes);
-    Task<IEnumerable<ProductEntity>> GetProductsBySubCategoryIdAsync(int categoryId);
+    Task<IEnumerable<ProductEntity>> GetProductsByCategoryIdAsync(int categoryId);
 }

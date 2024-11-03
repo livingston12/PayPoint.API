@@ -7,5 +7,5 @@ namespace PayPoint.Api.Controllers;
 [ApiController]
 public class BaseController : ControllerBase
 {
-    
+    protected static string ErrorMessageBadRequest => "Error Inesperado: intente de nuevo o contacte con el administrador.";
 }

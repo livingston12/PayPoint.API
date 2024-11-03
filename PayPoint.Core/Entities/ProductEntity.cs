@@ -1,13 +1,9 @@
-using System.ComponentModel.DataAnnotations;
 using PayPoint.Core.Enums;
-using PayPoint.Core.Interfaces;
 
 namespace PayPoint.Core.Entities;
 
-public class ProductEntity : BaseEntity, IEntity
+public class ProductEntity : BaseEntity
 {
-    public int Id => ProductId;
-
     public int ProductId { get; set; }
     public string Name { get; private set; }
     public string? ImageUrl { get; set; }
