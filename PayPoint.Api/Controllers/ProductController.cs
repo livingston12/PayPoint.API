@@ -66,11 +66,23 @@ public class ProductController : BaseController
         return CreatedAtAction(nameof(GetProductById), new { id = product!.ProductId }, product);
     }
 
-    // [HttpPost("{id}/ingredient")]
-    // public async Task<IActionResult> AddProductIngredient(int id, [FromBody] ProductIngredientCreateDto productIngredientCreateDto)
-    // {
-    //     Product? product = await _productService.AddProductIngredientAsync(id, productIngredientCreateDto);
-    // }
+    [HttpPost("{id}/ingredient")]
+    public async Task<IActionResult> AddUpdateProductIngredient(int id, [FromBody] IEnumerable<ProductIngredientCreateDto>? productIngredientCreateDtos)
+    {
+        if (productIngredientCreateDtos.IsNullOrEmpty())
+        {
+            return BadRequest(ErrorMessageBadRequest);
+        }
+
+        Product? product = await _productService.AddUpdateProductIngredientAsync(id, productIngredientCreateDtos!);
+
+        if (product.IsNullOrEmpty())
+        {
+            return BadRequest(ErrorMessageBadRequest);
+        }
+
+        return CreatedAtAction(nameof(GetProductById), new { id = product!.ProductId, includeIngredients = true }, product);
+    }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)

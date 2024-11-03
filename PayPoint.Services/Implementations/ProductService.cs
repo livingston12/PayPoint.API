@@ -125,7 +125,7 @@ public class ProductService : BaseService, IProductService
                 productEntity.ProductIngredients = new List<ProductIngredientEntity>();
             }
 
-            await AddIngredients(productEntity, productCreateDto.IngredientIds.ToSafeList());
+            await AddIngredientsToProduct(productEntity, productCreateDto.IngredientIds.ToSafeList());
         }
 
         await _unitOfWork.Products.AddAsync(productEntity);
@@ -139,21 +139,36 @@ public class ProductService : BaseService, IProductService
         return _mapper.Map<Product>(productEntity);
     }
 
-    public async Task<bool> DeleteProductAsync(int id)
+    public async Task<Product?> AddUpdateProductIngredientAsync(int id, IEnumerable<ProductIngredientCreateDto> productIngredientCreateDto)
     {
-        _ = await GetProductById(id);
+        ProductEntity productEntity = await GetProductById(id, true);
 
-        await _unitOfWork.Products.DeleteAsync(id);
-        int? rowsDeleted = await _unitOfWork.SaveChangesAsync();
+        if (productEntity.ProductIngredients.IsNullOrEmpty())
+        {
+            productEntity.ProductIngredients = new List<ProductIngredientEntity>();
+        }
 
-        return rowsDeleted.IsGreaterThan(0);
+        Dictionary<int, int?> ingredientQuantityIds = productIngredientCreateDto.ToDictionary(x => x.IngredientId!.Value, x => x.Quantity);
+
+        // Add new ingredients or update existing.
+        await UpdateIngredientsToProduct(productEntity, ingredientQuantityIds);
+
+        int? rowsAffected = await _unitOfWork.SaveChangesAsync();
+
+        if (rowsAffected.IsLessThanOrEqualTo(0))
+        {
+            return null;
+        }
+
+        return _mapper.Map<Product>(productEntity);
     }
 
     public async Task<bool> UpdateProductAsync(int id, ProductUpdateDto productUpdateDto)
     {
         ProductEntity productEntity = await GetProductById(id, true);
+        IEnumerable<int>? ingredientIds = productUpdateDto.IngredientIds;
 
-        if (productUpdateDto.IngredientIds.IsNotNullOrEmpty() && productEntity.HasIngredients)
+        if (ingredientIds.IsNotNullOrEmpty() && productEntity.ProductIngredients.IsNotNullOrEmpty())
         {
             productEntity.HasIngredients = true;
 
@@ -162,19 +177,23 @@ public class ProductService : BaseService, IProductService
                 productEntity.ProductIngredients = new List<ProductIngredientEntity>();
             }
 
-            UpdateIngredients(productEntity, productUpdateDto);
+            UpdateRemoveIngredientsToProduct(productEntity, ingredientIds!);
         }
 
         _mapper.Map(productUpdateDto, productEntity);
-
-        if (productEntity.IsNullOrEmpty())
-        {
-            throw new Exception("Cannot update product");
-        }
-
         _unitOfWork.Products.Update(productEntity!);
         int? rowsUpdated = await _unitOfWork.SaveChangesAsync();
 
         return rowsUpdated.IsGreaterThan(0);
+    }
+
+    public async Task<bool> DeleteProductAsync(int id)
+    {
+        _ = await GetProductById(id);
+
+        await _unitOfWork.Products.DeleteAsync(id);
+        int? rowsDeleted = await _unitOfWork.SaveChangesAsync();
+
+        return rowsDeleted.IsGreaterThan(0);
     }
 }
