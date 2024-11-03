@@ -16,11 +16,22 @@ public class MappingProfile : Profile
     {
         CreateMap<ProductCreateDto, ProductEntity>();
         CreateMap<ProductUpdateDto, ProductEntity>();
-        CreateMap<ProductEntity, Product>();
+        CreateMap<ProductEntity, Product>()
+        .ForMember(dest => dest.Ingredients, opt =>
+        {
+            opt.PreCondition(src => src.ProductIngredients.IsNotNullOrEmpty() && src.ProductIngredients!.Any());
+            opt.MapFrom(src => src.ProductIngredients!.Select(x => x.Ingredient).ToList());
+        })
+            // If SubCategoryId is 0, it means that the subcategory was not created yet.
+        .ForMember(dest => dest.SubCategory, opt => opt.MapFrom(src =>
+                    src.SubCategory.SubCategoryId == 0 && src.SubCategory.Name.IsNullOrEmpty()
+                    ? null
+                    : src.SubCategory));
 
         CreateMap<CategoryCreateDto, CategoryEntity>();
         CreateMap<CategoryUpdateDto, CategoryEntity>();
         CreateMap<CategoryEntity, Category>();
+        CreateMap<CategoryEntity, CategoryDto>();
 
         CreateMap<SubCategoryCreateDto, SubCategoryEntity>();
         CreateMap<SubCategoryUpdateDto, SubCategoryEntity>();

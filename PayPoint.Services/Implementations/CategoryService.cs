@@ -21,7 +21,7 @@ public class CategoryService : BaseService, ICategoryService
         _mapper = mapper;
     }
 
-    public async Task<Category?> GetCategoryByIdAsync(int CategoryId, CategoryDto CategoryDto)
+    public async Task<Category?> GetCategoryByIdAsync(int CategoryId, CategoryInputDto CategoryDto)
     {
         if (CategoryDto is null || CategoryId <= 0) return null;
 
@@ -42,7 +42,7 @@ public class CategoryService : BaseService, ICategoryService
         return _mapper.Map<Category>(categoryEntity);
     }
 
-    public async Task<IEnumerable<Category>> GetCategoriesAsync(CategoryDto CategoryDto)
+    public async Task<IEnumerable<Category>> GetCategoriesAsync(CategoryInputDto CategoryDto)
     {
         IQueryable<CategoryEntity> query = _unitOfWork.Categories.AsQueryable();
 

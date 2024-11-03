@@ -29,15 +29,7 @@ public class ProductService : BaseService, IProductService
 
         IQueryable<ProductEntity> query = _unitOfWork.Products.AsQueryable();
 
-        if (productDto.IncludeSubCategory != false)
-        {
-            query = query.Include(x => x.SubCategory);
-        }
-
-        if (productDto.IncludeIngredients == true)
-        {
-            query = query.Include(x => x.ProductIngredients);
-        }
+        query = ApplyIncludes(query, productDto, null);
 
         ProductEntity? productEntity = await query.FirstOrDefaultAsync(x => x.ProductId == productId);
 
@@ -62,11 +54,6 @@ public class ProductService : BaseService, IProductService
 
         query = ApplyIncludes(query, productDto, categoryId);
 
-        if (categoryId.HasValue && categoryId > 0)
-        {
-            query = query.Where(x => x.SubCategory!.CategoryId == categoryId.Value);
-        }
-
         IEnumerable<ProductEntity?> productsEntity = await query.ToListAsync();
 
         if (productsEntity.IsNullOrEmpty())
@@ -81,8 +68,9 @@ public class ProductService : BaseService, IProductService
     {
         bool isCategoryIdFiltered = categoryId.HasValue && categoryId > 0;
         productDto.IncludeCategories = isCategoryIdFiltered || productDto.IncludeCategories == true;
-       
-        if (productDto.IncludeCategories == true)
+
+        // Include SubCategory and Category.
+        if (productDto.IncludeAll == true || productDto.IncludeCategories == true)
         {
             query = query.Include(x => x.SubCategory.Category);
 
@@ -91,14 +79,18 @@ public class ProductService : BaseService, IProductService
                 query = query.Where(x => x.SubCategory.CategoryId == categoryId!.Value);
             }
         }
-        else if (productDto.IncludeSubCategory == true )
+        else if (productDto.IncludeSubCategory == true)
         {
             query = query.Include(x => x.SubCategory);
         }
 
-        if (productDto.IncludeIngredients == true)
+        // Include Ingredients.
+        if (productDto.IncludeAll == true || productDto.IncludeIngredients == true)
         {
-            query = query.Include(x => x.ProductIngredients);
+            query = query
+                        .Where(x => x.ProductIngredients != null)
+                        .Include(x => x.ProductIngredients!)
+                        .ThenInclude(x => x.Ingredient);
         }
 
         return query;
@@ -133,7 +125,7 @@ public class ProductService : BaseService, IProductService
                 productEntity.ProductIngredients = new List<ProductIngredientEntity>();
             }
 
-            AddIngredients(productEntity, productCreateDto.IngredientIds.ToSafeList());
+            await AddIngredients(productEntity, productCreateDto.IngredientIds.ToSafeList());
         }
 
         await _unitOfWork.Products.AddAsync(productEntity);
@@ -159,7 +151,7 @@ public class ProductService : BaseService, IProductService
 
     public async Task<bool> UpdateProductAsync(int id, ProductUpdateDto productUpdateDto)
     {
-        ProductEntity productEntity = await GetProductById(id);
+        ProductEntity productEntity = await GetProductById(id, true);
 
         if (productUpdateDto.IngredientIds.IsNotNullOrEmpty() && productEntity.HasIngredients)
         {

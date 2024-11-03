@@ -17,7 +17,7 @@ public class ProductController : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetProducts([FromHeader(Name = "CategoryId")] int? CategoryId, [FromHeader(Name = "IncludeIngredients")][FromQuery] ProductDto productDto)
+    public async Task<IActionResult> GetProducts([FromHeader(Name = "CategoryId")] int? CategoryId, [FromQuery] ProductDto productDto)
     {
         IEnumerable<Product> products = await _productService.GetProductsAsync(CategoryId, productDto);
 
@@ -32,7 +32,7 @@ public class ProductController : BaseController
         ProductDto productDto = new()
         {
             IncludeIngredients = includeIngredients == true,
-            IncludeSubCategory = ExcludeSubCategory == false
+            IncludeSubCategory = ExcludeSubCategory != true
         };
 
         Product? product = await _productService.GetProductByIdAsync(id, productDto);
@@ -65,6 +65,12 @@ public class ProductController : BaseController
 
         return CreatedAtAction(nameof(GetProductById), new { id = product!.ProductId }, product);
     }
+
+    // [HttpPost("{id}/ingredient")]
+    // public async Task<IActionResult> AddProductIngredient(int id, [FromBody] ProductIngredientCreateDto productIngredientCreateDto)
+    // {
+    //     Product? product = await _productService.AddProductIngredientAsync(id, productIngredientCreateDto);
+    // }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int id)

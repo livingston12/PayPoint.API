@@ -19,7 +19,7 @@ public class CategoryController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetCategories([FromHeader(Name = "IncludeSubCategories")] bool? includeSubCategories)
     {
-        CategoryDto categoryDto = new CategoryDto(IncludeSubCategories: includeSubCategories == true);
+        CategoryInputDto categoryDto = new CategoryInputDto(IncludeSubCategories: includeSubCategories == true);
         IEnumerable<Category> categories = await _categoryService.GetCategoriesAsync(categoryDto);
 
         categories = categories.Select(x => x.ToCategoryHasIncludes(categoryDto.IncludeSubCategories));
@@ -30,7 +30,7 @@ public class CategoryController : BaseController
     [HttpGet("{id}")]
     public async Task<IActionResult> GetCategoryById(int id, [FromHeader(Name = "IncludeSubCategories")] bool? includeSubCategories)
     {
-        CategoryDto categoryDto = new CategoryDto(IncludeSubCategories: includeSubCategories == true);
+        CategoryInputDto categoryDto = new CategoryInputDto(IncludeSubCategories: includeSubCategories == true);
         Category? category = await _categoryService.GetCategoryByIdAsync(id, categoryDto);
 
         if (category.IsNullOrEmpty())

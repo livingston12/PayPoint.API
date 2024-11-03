@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 using PayPoint.Core.DTOs.Categories;
 using PayPoint.Core.DTOs.Products;
 using PayPoint.Core.Entities;
@@ -17,23 +18,28 @@ public class BaseService
         _unitOfWork = unitOfWork;
     }
 
-    protected void AddIngredients(ProductEntity productEntity, IEnumerable<int> ingredientIds)
+    protected async Task AddIngredients(ProductEntity productEntity, IEnumerable<int> ingredientIds)
     {
-        // productCreateDto.IngredientIds.ToSafeList()
         foreach (int ingredientId in ingredientIds)
         {
-            productEntity.ProductIngredients!.Add(new ProductIngredientEntity
+            IngredientEntity ingredientEntity = await GetIngredientById(ingredientId, false);
+
+            if (ingredientEntity.IsNotNullOrEmpty())
             {
-                ProductId = productEntity.ProductId,
-                IngredientId = ingredientId
-            });
+                productEntity.ProductIngredients!.Add(new ProductIngredientEntity
+                {
+                    ProductId = productEntity.ProductId,
+                    IngredientId = ingredientId,
+                    Ingredient = ingredientEntity
+                });
+            }
         }
     }
 
-    protected void UpdateIngredients(ProductEntity productEntity, ProductUpdateDto productUpdateDto)
+    protected async void UpdateIngredients(ProductEntity productEntity, ProductUpdateDto productUpdateDto)
     {
-        List<int>? existingIngredientIds = productEntity.ProductIngredients!.Select(pi => pi.IngredientId).ToList();
-        List<int>? ingredientIdsToUpdate = productUpdateDto.IngredientIds.ToSafeList();
+        List<int> existingIngredientIds = productEntity.ProductIngredients!.Select(pi => pi.IngredientId).ToSafeList();
+        List<int> ingredientIdsToUpdate = productUpdateDto.IngredientIds.ToSafeList();
 
         // Delete ingredients that are not in the new list.
         foreach (int ingredientId in existingIngredientIds)
@@ -46,7 +52,7 @@ public class BaseService
         }
 
         // Add new ingredients.
-        AddIngredients(productEntity, ingredientIdsToUpdate);
+        await AddIngredients(productEntity, ingredientIdsToUpdate);
     }
 
     protected async Task<SubCategoryEntity> GetSubCategoryById(int subCategoryId)
@@ -61,9 +67,20 @@ public class BaseService
         return subCategoryEntity!;
     }
 
-    protected async Task<ProductEntity> GetProductById(int productId)
+    protected async Task<ProductEntity> GetProductById(int productId, bool includeProductIngredients = false)
     {
-        ProductEntity? productEntity = await _unitOfWork.Products.GetByIdAsync(productId);
+        ProductEntity? productEntity = null;
+
+        if (includeProductIngredients)
+        {
+            productEntity = await _unitOfWork.Products.AsQueryable()
+                .Include(p => p.ProductIngredients)
+                .FirstOrDefaultAsync(p => p.ProductId == productId);
+        }
+        else
+        {
+            productEntity = await _unitOfWork.Products.GetByIdAsync(productId);
+        }
 
         if (productEntity.IsNullOrEmpty())
         {
@@ -85,11 +102,11 @@ public class BaseService
         return categoryEntity!;
     }
 
-    protected async Task<IngredientEntity> GetIngredientById(int ingredientId)
+    protected async Task<IngredientEntity> GetIngredientById(int ingredientId, bool throwIfNotFound = true)
     {
         IngredientEntity? ingredientEntity = await _unitOfWork.Ingredients.GetByIdAsync(ingredientId);
 
-        if (ingredientEntity.IsNullOrEmpty())
+        if (ingredientEntity.IsNullOrEmpty() && throwIfNotFound)
         {
             throw new Exception("Ingredient not found.");
         }

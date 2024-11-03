@@ -2,10 +2,6 @@ namespace PayPoint.Core.DTOs.Categories;
 
 public class CategoryDto
 {
-    public CategoryDto(bool IncludeSubCategories)
-    {
-        this.IncludeSubCategories = IncludeSubCategories;
-    }
-
-    public bool IncludeSubCategories { get; set; }
+    public int CategoryId { get; set; }
+    public string Name { get; set; }
 }
