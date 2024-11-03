@@ -85,4 +85,16 @@ public class BaseService
         return categoryEntity!;
     }
 
+    protected async Task<IngredientEntity> GetIngredientById(int ingredientId)
+    {
+        IngredientEntity? ingredientEntity = await _unitOfWork.Ingredients.GetByIdAsync(ingredientId);
+
+        if (ingredientEntity.IsNullOrEmpty())
+        {
+            throw new Exception("Ingredient not found.");
+        }
+
+        return ingredientEntity!;
+    }
+
 }

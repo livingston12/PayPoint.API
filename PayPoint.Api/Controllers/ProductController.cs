@@ -63,7 +63,7 @@ public class ProductController : BaseController
             return BadRequest(ErrorMessageBadRequest);
         }
 
-        return Ok();
+        return CreatedAtAction(nameof(GetProductById), new { id = product!.ProductId }, product);
     }
 
     [HttpDelete("{id}")]

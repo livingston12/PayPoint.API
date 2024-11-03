@@ -30,5 +30,8 @@ public class MappingProfile : Profile
 
 
         CreateMap<IngredientEntity, IngredientDto>();
+        CreateMap<IngredientCreateDto, IngredientEntity>();
+        CreateMap<IngredientUpdateDto, IngredientEntity>();
+        CreateMap<IngredientEntity, Ingredient>();
     }
 }

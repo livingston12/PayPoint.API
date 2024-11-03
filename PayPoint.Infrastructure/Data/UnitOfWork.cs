@@ -12,13 +12,14 @@ public class UnitOfWork : IUnitOfWork
     public IProductRepository Products {get; private set;}
     public ICategoryRepository Categories {get; private set;}
     public IRepository<SubCategoryEntity> SubCategories {get; private set;}
-
+    public IRepository<IngredientEntity> Ingredients {get; private set;}
 
     public UnitOfWork(PayPointDbContext context) {
         _context = context;
         Products = new ProductRepository(_context);
         Categories = new CategoryRepository(_context);
         SubCategories = new Repository<SubCategoryEntity>(_context);
+        Ingredients = new Repository<IngredientEntity>(_context);
     }
 
     public void Dispose()
