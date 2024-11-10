@@ -9,9 +9,8 @@ public class PaymentEntity
     public int PaymentMethodId { get; set; }
     public decimal Amount { get; set; }
     public DateTime PaymentDate { get; set; } = DateTime.UtcNow;
-    public PaymentStatus Estatus { get; set; }
+    public PaymentStatus Status { get; set; }
 
     public OrderEntity Order { get; set; }
     public PaymentMethodEntity PaymentMethod { get; set; }
-
 }

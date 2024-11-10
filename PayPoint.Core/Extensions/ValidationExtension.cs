@@ -8,6 +8,7 @@ public static class ValidationExtension
     public static bool IsNotNullOrEmpty(this IEnumerable? obj) => !obj.IsNullOrEmpty();
     public static bool IsNullOrEmpty<T>(this T? obj) where T : class => obj is null;
     public static bool IsNotNullOrEmpty<T>(this T? obj) where T : class => obj is not null;
+    public static bool IsNullOrEmpty<T>(this T? obj) where T : struct => obj is null;
 
     /// <summary>
     /// Determines whether the given object is null or empty.

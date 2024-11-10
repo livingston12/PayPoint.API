@@ -14,6 +14,7 @@ public class ProductEntity : BaseEntity
     public ProductStatus Status { get; set; }
     public bool HasIngredients { get; set; }
 
-    public ICollection<ProductIngredientEntity>? ProductIngredients { get; set; }
     public SubCategoryEntity SubCategory { get; set; } = new();
+    public ICollection<ProductIngredientEntity>? ProductIngredients { get; set; }
+    public ICollection<OrderDetailEntity>? OrderDetails { get; set; }
 }

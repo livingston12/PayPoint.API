@@ -7,7 +7,7 @@ public class InvoiceEntity
     public int UserId { get; set; }
     public int OrderId { get; set; }
     public DateTime EmisionDate { get; set; }
-    public string Detail { get; set; }
+    public string? Detail { get; set; }
     public decimal TotalAmount { get; set; }
     public decimal? Discount { get; set; }
     public decimal? Tax { get; set; }

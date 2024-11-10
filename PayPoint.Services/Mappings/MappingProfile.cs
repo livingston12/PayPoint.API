@@ -2,8 +2,11 @@ using AutoMapper;
 using PayPoint.Core.DTOs;
 using PayPoint.Core.DTOs.Categories;
 using PayPoint.Core.DTOs.Ingredients;
+using PayPoint.Core.DTOs.Orders;
 using PayPoint.Core.DTOs.Products;
+using PayPoint.Core.DTOs.Rooms;
 using PayPoint.Core.DTOs.SubCategories;
+using PayPoint.Core.DTOs.Tables;
 using PayPoint.Core.Entities;
 using PayPoint.Core.Extensions;
 using PayPoint.Core.Models;
@@ -22,7 +25,7 @@ public class MappingProfile : Profile
             opt.PreCondition(src => src.ProductIngredients.IsNotNullOrEmpty() && src.ProductIngredients!.Any());
             opt.MapFrom(src => src.ProductIngredients!.Select(x => x.Ingredient).ToList());
         })
-            // If SubCategoryId is 0, it means that the subcategory was not created yet.
+        // If SubCategoryId is 0, it means that the subcategory was not created yet.
         .ForMember(dest => dest.SubCategory, opt => opt.MapFrom(src =>
                     src.SubCategory.SubCategoryId == 0 && src.SubCategory.Name.IsNullOrEmpty()
                     ? null
@@ -39,10 +42,23 @@ public class MappingProfile : Profile
         CreateMap<CategoryEntity, SubCategoryCategory>();
         CreateMap<SubCategoryEntity, SubCategoryDto>();
 
-
         CreateMap<IngredientEntity, IngredientDto>();
         CreateMap<IngredientCreateDto, IngredientEntity>();
         CreateMap<IngredientUpdateDto, IngredientEntity>();
         CreateMap<IngredientEntity, Ingredient>();
+
+        CreateMap<RoomCreateDto, RoomEntity>();
+        CreateMap<RoomUpdateDto, RoomEntity>();
+        CreateMap<RoomEntity, Room>();
+
+        CreateMap<TableCreateDto, TableEntity>();
+        CreateMap<TableUpdateDto, TableEntity>();
+        CreateMap<TableEntity, Table>();
+        CreateMap<TableEntity, TableDto>();
+
+        CreateMap<OrderCreateDto, OrderEntity>()
+            .ForMember(dest => dest.OrderDetails, opt => opt.Ignore());
+        CreateMap<OrderUpdateDto, OrderEntity>();
+        CreateMap<OrderEntity, Order>();
     }
 }

@@ -22,6 +22,9 @@ public static class DependencyInjection
         services.AddScoped<ICategoryService, CategoryService>();
         services.AddScoped<ISubCategoryService, SubCategoryService>();
         services.AddScoped<IIngredientService, IngredientService>();
+        services.AddScoped<ITableService, TableService>();
+        services.AddScoped<IRoomService, RoomService>();
+        services.AddScoped<IOrderService, OrderService>();
 
 
         services.AddAutoMapper(typeof(MappingProfile).Assembly);

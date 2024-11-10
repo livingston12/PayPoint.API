@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PayPoint.Infrastructure.Data;
@@ -11,9 +12,11 @@ using PayPoint.Infrastructure.Data;
 namespace PayPoint.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(PayPointDbContext))]
-    partial class PayPointDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241110010236_addOrderChanges")]
+    partial class addOrderChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

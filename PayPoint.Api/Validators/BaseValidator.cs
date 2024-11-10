@@ -37,4 +37,10 @@ public class BaseValidator<TDto> : AbstractValidator<TDto>
             .NotEmpty().WithMessage("La sub-categoria es obligatoria.")
             .GreaterThan(0).WithMessage("La sub-categoria debe ser mayor a 0.");
     }
+
+    protected IRuleBuilderOptions<TDto, int?>? GreaterThan(Expression<Func<TDto, int?>> propertyExpression, int value)
+    {
+        return RuleFor(propertyExpression)
+            .GreaterThan(value);
+    }
 }

@@ -4,7 +4,7 @@ namespace PayPoint.Core.Entities;
 public class UserEntity
 {
     public int UserId { get; set; }
-    public string FirtName { get; set; }
+    public string FirstName { get; set; }
     public string? LastName { get; set; }
     public string? Phone { get; set; }
     public string? Email { get; set; }
@@ -12,6 +12,7 @@ public class UserEntity
     public DateTime? HireDate { get; set; }
     public decimal? Salary { get; set; }
     public string? Turn { get; set; }
+    public bool IsActive { get; set; }
 
     public ICollection<OrderEntity>? Orders { get; set; }
     public ICollection<InvoiceEntity>? Invoices { get; set; }

@@ -2,7 +2,7 @@ namespace PayPoint.Core.Enums;
 
 public enum TableStatus
 {
-    Available,
+    Available = 1,
     Busy,
     Reserved
 }

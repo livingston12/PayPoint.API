@@ -6,5 +6,5 @@ public class OrderStatusEntity : BaseEntity
     public string Name { get; set; }
     public string? Description { get; set; }
 
-    public ICollection<OrderEntity> Orders { get; set; } = new List<OrderEntity>();
+    public ICollection<OrderEntity>? Orders { get; set; }
 }

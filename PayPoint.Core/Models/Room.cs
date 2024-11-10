@@ -1,11 +1,13 @@
-namespace PayPoint.Core.Entities;
+using PayPoint.Core.DTOs.Tables;
 
-public class RoomEntity : BaseEntity
+namespace PayPoint.Core.Models;
+
+public class Room
 {
     public int RoomId { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }
     public int? Capacity { get; set; }
     
-    public ICollection<TableEntity> Tables { get; set; } = new List<TableEntity>();
+    public IEnumerable<TableDto>? Tables { get; set; }
 }

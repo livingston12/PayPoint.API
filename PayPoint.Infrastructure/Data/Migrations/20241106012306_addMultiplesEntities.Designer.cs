@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PayPoint.Infrastructure.Data;
@@ -11,9 +12,11 @@ using PayPoint.Infrastructure.Data;
 namespace PayPoint.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(PayPointDbContext))]
-    partial class PayPointDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241106012306_addMultiplesEntities")]
+    partial class addMultiplesEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,32 +190,6 @@ namespace PayPoint.Infrastructure.Data.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Invoices", (string)null);
-                });
-
-            modelBuilder.Entity("PayPoint.Core.Entities.OrderDetailEntity", b =>
-                {
-                    b.Property<int>("OrderId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal?>("Discount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("integer");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
-                    b.HasKey("OrderId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("OrderDetails", (string)null);
                 });
 
             modelBuilder.Entity("PayPoint.Core.Entities.OrderEntity", b =>
@@ -624,25 +601,6 @@ namespace PayPoint.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("PayPoint.Core.Entities.OrderDetailEntity", b =>
-                {
-                    b.HasOne("PayPoint.Core.Entities.OrderEntity", "Order")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("PayPoint.Core.Entities.ProductEntity", "Product")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("PayPoint.Core.Entities.OrderEntity", b =>
                 {
                     b.HasOne("PayPoint.Core.Entities.OrderStatusEntity", "Status")
@@ -759,8 +717,6 @@ namespace PayPoint.Infrastructure.Data.Migrations
                 {
                     b.Navigation("Invoices");
 
-                    b.Navigation("OrderDetails");
-
                     b.Navigation("Payments");
                 });
 
@@ -778,8 +734,6 @@ namespace PayPoint.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("PayPoint.Core.Entities.ProductEntity", b =>
                 {
-                    b.Navigation("OrderDetails");
-
                     b.Navigation("ProductIngredients");
                 });
 

@@ -1,9 +1,5 @@
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using PayPoint.Core.DTOs.Categories;
-using PayPoint.Core.DTOs.Products;
 using PayPoint.Core.Entities;
-using PayPoint.Core.Enums;
 using PayPoint.Core.Extensions;
 using PayPoint.Core.Interfaces;
 
@@ -150,5 +146,29 @@ public class BaseService
         }
 
         return ingredientEntity;
+    }
+
+    protected async Task<TableEntity> GetTableById(int tableId)
+    {
+        TableEntity? tableEntity = await _unitOfWork.Tables.GetByIdAsync(tableId);
+
+        if (tableEntity.IsNullOrEmpty())
+        {
+            throw new Exception("Table not found.");
+        }
+
+        return tableEntity!;
+    }
+
+    protected async Task<RoomEntity?> GetRoomById(int RoomId)
+    {
+        RoomEntity? roomEntity = await _unitOfWork.Rooms.GetByIdAsync(RoomId);
+
+        if (roomEntity.IsNullOrEmpty())
+        {
+            throw new Exception("Table not found.");
+        }
+
+        return roomEntity;
     }
 }
