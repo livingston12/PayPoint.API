@@ -5,9 +5,9 @@ namespace PayPoint.Services.Interfaces;
 
 public interface ICustomerService
 {
-    Task<Customer?> GetCustomerByIdAsync(int CustomerId);
-    Task<IEnumerable<Customer>> GetCustomersAsync(CustomerInputDto CustomerDto);
-    Task<Customer?> AddCustomerAsync(CustomerCreateDto CustomerCreateDto);
-    Task<bool> UpdateCustomerAsync(int id, CustomerUpdateDto CustomerUpdateDto);
-    Task<bool> DeleteCustomerAsync(int id);
+    Task<Customer?> GetCustomerByIdAsync(int customerId, CustomerInputDto customerDto);
+    Task<IEnumerable<Customer>> GetCustomersAsync();
+    Task<Customer?> AddCustomerAsync(CustomerCreateDto customerCreateDto);
+    Task<bool?> UpdateCustomerAsync(int customerId, CustomerUpdateDto customerUpdateDto);
+    Task<bool?> DeleteCustomerAsync(int customerId);
 }

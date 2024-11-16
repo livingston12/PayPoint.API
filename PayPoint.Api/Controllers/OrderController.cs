@@ -23,11 +23,19 @@ namespace PayPoint.Api.Controllers
             return Ok(orders);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetOrderStatues()
+        {
+            IEnumerable<OrderStatus> orders = await _orderService.GetOrderStatusAsync();
+
+            return Ok(orders);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetOrder(int id)
         {
             Order? order = await _orderService.GetOrderByIdAsync(id);
-            
+
             if (order.IsNullOrEmpty())
             {
                 return NotFound("La orden no fue encontrada.");

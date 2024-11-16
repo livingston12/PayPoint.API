@@ -7,6 +7,7 @@ public interface IOrderService
 {
     Task<Order?> GetOrderByIdAsync(int OrderId);
     Task<IEnumerable<Order>> GetOrdersAsync();
+    Task<IEnumerable<OrderStatus>> GetOrderStatusAsync();
     Task<Order?> AddOrderAsync(OrderCreateDto OrderCreateDto);
     Task<bool?> UpdateOrderAsync(int OrderId, OrderUpdateDto OrderUpdateDto);
     Task<bool?> DeleteOrderAsync(int OrderId);

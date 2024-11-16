@@ -25,8 +25,6 @@ public class ProductService : BaseService, IProductService
 
     public async Task<Product?> GetProductByIdAsync(int productId, ProductDto productDto)
     {
-        if (productDto is null || productId <= 0) return null;
-
         IQueryable<ProductEntity> query = _unitOfWork.Products.AsQueryable();
 
         query = ApplyIncludes(query, productDto, null);
@@ -67,10 +65,10 @@ public class ProductService : BaseService, IProductService
     private IQueryable<ProductEntity> ApplyIncludes(IQueryable<ProductEntity> query, ProductDto productDto, int? categoryId)
     {
         bool isCategoryIdFiltered = categoryId.HasValue && categoryId > 0;
-        productDto.IncludeCategories = isCategoryIdFiltered || productDto.IncludeCategories == true;
+        productDto.IncludeCategory = isCategoryIdFiltered || productDto.IncludeCategory == true;
 
         // Include SubCategory and Category.
-        if (productDto.IncludeAll == true || productDto.IncludeCategories == true)
+        if (productDto.IncludeAll == true || productDto.IncludeCategory == true)
         {
             query = query.Include(x => x.SubCategory.Category);
 
@@ -85,7 +83,7 @@ public class ProductService : BaseService, IProductService
         }
 
         // Include Ingredients.
-        if (productDto.IncludeAll == true || productDto.IncludeIngredients == true)
+        if (productDto.IncludeAll == true || productDto.IncludeIngredient == true)
         {
             query = query
                         .Where(x => x.ProductIngredients != null)

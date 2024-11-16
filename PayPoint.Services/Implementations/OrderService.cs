@@ -119,6 +119,13 @@ public class OrderService : BaseService, IOrderService
         return orders;
     }
 
+    public async Task<IEnumerable<OrderStatus>> GetOrderStatusAsync()
+    {
+        IEnumerable<OrderStatusEntity>? orderStatusEntity = await _unitOfWork.Orders.GetAllStatusAsync();
+
+        return _mapper.Map<IEnumerable<OrderStatus>>(orderStatusEntity);
+    }
+
     public async Task<bool?> UpdateOrderAsync(int orderId, OrderUpdateDto OrderUpdateDto)
     {
         OrderEntity? orderEntity = await _unitOfWork.Orders.GetByIdAsync(orderId);

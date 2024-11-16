@@ -26,13 +26,16 @@ public class ProductController : BaseController
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetProductById(int id,
-        [FromQuery(Name = "IncludeIngredients")] bool? includeIngredients,
-        [FromHeader(Name = "ExcludeSubCategory")] bool? ExcludeSubCategory)
+        [FromQuery(Name = "IncludeIngredient")] bool? includeIngredient,
+        [FromQuery(Name = "IncludeCategory")] bool? includeCategory,
+        [FromHeader(Name = "ExcludeSubCategory")] bool? excludeSubCategory
+        )
     {
         ProductDto productDto = new()
         {
-            IncludeIngredients = includeIngredients == true,
-            IncludeSubCategory = ExcludeSubCategory != true
+            IncludeIngredient = includeIngredient == true,
+            IncludeSubCategory = excludeSubCategory != true,
+            IncludeCategory = includeCategory == true
         };
 
         Product? product = await _productService.GetProductByIdAsync(id, productDto);

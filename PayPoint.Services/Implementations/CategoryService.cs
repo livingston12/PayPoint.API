@@ -23,8 +23,6 @@ public class CategoryService : BaseService, ICategoryService
 
     public async Task<Category?> GetCategoryByIdAsync(int CategoryId, CategoryInputDto CategoryDto)
     {
-        if (CategoryDto is null || CategoryId <= 0) return null;
-
         IQueryable<CategoryEntity> query = _unitOfWork.Categories.AsQueryable();
 
         if (CategoryDto.IncludeSubCategories == true)

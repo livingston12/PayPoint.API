@@ -23,7 +23,7 @@ public class MappingProfile : Profile
         .ForMember(dest => dest.Ingredients, opt =>
         {
             opt.PreCondition(src => src.ProductIngredients.IsNotNullOrEmpty() && src.ProductIngredients!.Any());
-            opt.MapFrom(src => src.ProductIngredients!.Select(x => x.Ingredient).ToList());
+            opt.MapFrom(src => GetIngredientsFromProductEntity(src));
         })
         // If SubCategoryId is 0, it means that the subcategory was not created yet.
         .ForMember(dest => dest.SubCategory, opt => opt.MapFrom(src =>
@@ -60,5 +60,17 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.OrderDetails, opt => opt.Ignore());
         CreateMap<OrderUpdateDto, OrderEntity>();
         CreateMap<OrderEntity, Order>();
+    }
+
+    private object GetIngredientsFromProductEntity(ProductEntity src)
+    {
+        return src.ProductIngredients!
+                .Select(x => new IngredientDto
+                {
+                    IngredientId = x.Ingredient.IngredientId,
+                    Name = x.Ingredient.Name,
+                    Quantity = x.Quantity
+                })
+                .ToList();
     }
 }

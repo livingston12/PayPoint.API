@@ -18,7 +18,7 @@ public class PayPointDbContext : DbContext
     public DbSet<RoomEntity> Rooms { get; set; }
     public DbSet<OrderEntity> Orders { get; set; }
     public DbSet<OrderDetailEntity> OrderDetails { get; set; }
-    public DbSet<OrderStatusEntity> OrderStatuses { get; set; }
+    public DbSet<OrderStatusEntity> OrderStatus { get; set; }
     public DbSet<UserEntity> Users { get; set; }
     public DbSet<PaymentEntity> Payments { get; set; }
     public DbSet<InvoiceEntity> Invoices { get; set; }

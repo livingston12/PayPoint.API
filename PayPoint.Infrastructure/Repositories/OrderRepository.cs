@@ -1,4 +1,6 @@
+using Microsoft.EntityFrameworkCore;
 using PayPoint.Core.Entities;
+using PayPoint.Core.Extensions;
 using PayPoint.Core.Interfaces;
 using PayPoint.Infrastructure.Data;
 
@@ -13,18 +15,28 @@ public class OrderRepository : Repository<OrderEntity>, IOrderRepository
         _context = context;
     }
 
-    public Task AddDetailAsync(OrderDetailEntity orderDetailEntity)
+    public async Task AddDetailAsync(OrderDetailEntity orderDetailEntity)
     {
-        throw new NotImplementedException();
+        await _context.OrderDetails.AddAsync(orderDetailEntity);
     }
 
-    public Task DeleteDetailAsync(int detailId)
+    public async Task DeleteDetailAsync(int orderId, int productId)
     {
-        throw new NotImplementedException();
+        OrderDetailEntity? orderDetailEntity = await _context.OrderDetails.FirstOrDefaultAsync(x => x.OrderId == orderId && x.ProductId == productId);
+
+        if (orderDetailEntity.IsNotNullOrEmpty())
+        {
+            _context.OrderDetails.Remove(orderDetailEntity!);
+        }
+    }
+
+    public async Task<IEnumerable<OrderStatusEntity>?> GetAllStatusAsync()
+    {
+        return await _context.OrderStatus.ToListAsync();
     }
 
     public void UpdateDetail(OrderDetailEntity orderDetailEntity)
     {
-        throw new NotImplementedException();
+        _context.Update(orderDetailEntity);
     }
 }
