@@ -23,7 +23,7 @@ namespace PayPoint.Api.Controllers
             return Ok(orders);
         }
 
-        [HttpGet]
+        [HttpGet("status")]
         public async Task<IActionResult> GetOrderStatues()
         {
             IEnumerable<OrderStatus> orders = await _orderService.GetOrderStatusAsync();
@@ -57,10 +57,53 @@ namespace PayPoint.Api.Controllers
             return CreatedAtAction(nameof(GetOrder), new { id = order!.OrderId }, order);
         }
 
+        [HttpPost("{id}/details")]
+        public async Task<IActionResult> AddOrderDetails(int id, [FromBody] IEnumerable<OrderDetailDto> orderDetails)
+        {
+            OrderDetail? orderDetail = await _orderService.AddUpdateOrderDetailAsync(id, orderDetails);
+
+            if (orderDetail.IsNullOrEmpty())
+            {
+                return BadRequest("Error inesperado: intente de nuevo o contacte con el administrador.");
+            }
+
+            return CreatedAtAction(nameof(GetOrder), new { id = orderDetail!.OrderId }, orderDetail);
+        }
+
+        [HttpPost("status")]
+        public async Task<IActionResult> AddOrderStatus(OrderStatusCreateDto orderStatusCreateDto)
+        {
+            OrderStatus? orderStatus = await _orderService.AddOrderStatusAsync(orderStatusCreateDto);
+
+            if (orderStatus.IsNullOrEmpty())
+            {
+                return BadRequest("Error inesperado: intente de nuevo o contacte con el administrador.");
+            }
+
+            return CreatedAtAction(nameof(GetOrderStatues), new { id = orderStatus!.OrderStatusId }, orderStatus);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteOrder(int id)
         {
             bool? isDeleted = await _orderService.DeleteOrderAsync(id);
+
+            if (isDeleted.IsNullOrEmpty())
+            {
+                return BadRequest("Error inesperado: intente de nuevo o contacte con el administrador.");
+            }
+            else if (isDeleted == false)
+            {
+                return NotFound("La orden no fue encontrada.");
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("status/{statusId}")]
+        public async Task<IActionResult> DeleteOrderStatus(int statusId)
+        {
+            bool? isDeleted = await _orderService.DeleteOrderAsync(statusId);
 
             if (isDeleted.IsNullOrEmpty())
             {

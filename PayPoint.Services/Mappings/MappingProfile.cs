@@ -60,6 +60,9 @@ public class MappingProfile : Profile
             .ForMember(dest => dest.OrderDetails, opt => opt.Ignore());
         CreateMap<OrderUpdateDto, OrderEntity>();
         CreateMap<OrderEntity, Order>();
+        CreateMap<OrderStatusCreateDto, OrderStatusEntity>();
+        CreateMap<OrderStatusEntity, OrderStatus>();
+
     }
 
     private object GetIngredientsFromProductEntity(ProductEntity src)

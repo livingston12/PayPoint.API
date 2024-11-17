@@ -222,7 +222,7 @@ public class PayPointDbContext : DbContext
             b.Property(x => x.OrderStatusId).ValueGeneratedOnAdd();
             b.Property(x => x.Name).HasMaxLength(75).IsRequired();
             b.Property(x => x.Description).HasMaxLength(150).HasDefaultValue(string.Empty);
-            b.ToTable("OrderStatuses");
+            b.ToTable("OrderStatus");
         });
 
         // User relationship

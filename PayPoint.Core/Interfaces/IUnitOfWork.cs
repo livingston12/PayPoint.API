@@ -7,6 +7,7 @@ public interface IUnitOfWork : IDisposable
    IProductRepository Products { get; }
    ICategoryRepository Categories { get; }
    IOrderRepository Orders { get; }
+   IRepository<OrderStatusEntity> OrderStatus { get; }
    IRepository<SubCategoryEntity> SubCategories { get; }
    IRepository<IngredientEntity> Ingredients { get; }
    IRepository<TableEntity> Tables { get; }

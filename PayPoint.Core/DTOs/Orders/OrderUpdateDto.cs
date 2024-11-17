@@ -6,4 +6,5 @@ public class OrderUpdateDto
     public int UserId { get; set; }
     public int? CustomerId { get; set; }
     public int OrderStatusId { get; set; }
+    public IEnumerable<OrderDetailDto>? OrderDetails { get; set; }
 }

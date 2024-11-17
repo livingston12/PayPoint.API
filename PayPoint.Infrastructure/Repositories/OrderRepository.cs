@@ -30,13 +30,18 @@ public class OrderRepository : Repository<OrderEntity>, IOrderRepository
         }
     }
 
-    public async Task<IEnumerable<OrderStatusEntity>?> GetAllStatusAsync()
+    public void Update(OrderDetailEntity entity)
     {
-        return await _context.OrderStatus.ToListAsync();
+        _context.Update(entity);
     }
 
     public void UpdateDetail(OrderDetailEntity orderDetailEntity)
     {
         _context.Update(orderDetailEntity);
+    }
+
+    public IQueryable<OrderDetailEntity> DetailAsQueryable()
+    {
+        return _context.OrderDetails.AsQueryable();
     }
 }

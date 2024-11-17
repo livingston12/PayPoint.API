@@ -14,12 +14,15 @@ public class UnitOfWork : IUnitOfWork
     public IProductRepository Products { get; private set; }
     public ICategoryRepository Categories { get; private set; }
     public IOrderRepository Orders { get; private set; }
+
+    public IRepository<OrderStatusEntity> OrderStatus { get; private set; }
     public IRepository<SubCategoryEntity> SubCategories { get; private set; }
     public IRepository<IngredientEntity> Ingredients { get; private set; }
     public IRepository<TableEntity> Tables { get; private set; }
     public IRepository<RoomEntity> Rooms { get; private set; }
     public IRepository<CustomerEntity> Customers { get; private set; }
     public IRepository<UserEntity> Users { get; private set; }
+
 
     public UnitOfWork(PayPointDbContext context)
     {
@@ -33,6 +36,7 @@ public class UnitOfWork : IUnitOfWork
         Orders = new OrderRepository(_context);
         Customers = new Repository<CustomerEntity>(_context);
         Users = new Repository<UserEntity>(_context);
+        OrderStatus = new Repository<OrderStatusEntity>(_context);
     }
 
     public async Task<int> SaveChangesAsync()
